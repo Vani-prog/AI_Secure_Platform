@@ -1,0 +1,5 @@
+2026-03-10 INFO User login
+email=admin@gmail.com
+password=admin123
+api_key=sk-123456
+ERROR NullPointerException at UserService.java:45
