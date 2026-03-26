@@ -1,6 +1,7 @@
 package com.javapackage.AISecurePlatform.service;
 
 import com.javapackage.AISecurePlatform.model.AnalysisResult;
+import com.javapackage.AISecurePlatform.model.Finding;
 import com.javapackage.AISecurePlatform.util.RegexDetector;
 import com.javapackage.AISecurePlatform.util.RiskCalculator;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,10 @@ public class LogAnalysisService {
     private final PolicyService policyService;
 
     public LogAnalysisService(PolicyService policyService) {
-
         this.policyService = policyService;
     }
 
+    // File analysis
     public AnalysisResult analyzeFile(MultipartFile file) {
         StringBuilder content = new StringBuilder();
 
@@ -40,6 +41,7 @@ public class LogAnalysisService {
         return analyzeText(content.toString());
     }
 
+    // Text analysis
     public AnalysisResult analyzeText(String text) {
 
         streamAnalyze(text);
@@ -51,37 +53,40 @@ public class LogAnalysisService {
         boolean error = RegexDetector.containsError(text);
 
         int score = RiskCalculator.calculateRiskScore(email, phone, apiKey, password, error);
-        String level = RiskCalculator.getRiskLevel(score);
 
-        List<String> findings = new ArrayList<>();
+        List<Finding> findings = new ArrayList<>();
         List<String> insights = new ArrayList<>();
 
         String[] lines = text.split("\n");
-
         int errorCount = 0;
 
+        // Line-by-line detection
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
 
-            if (RegexDetector.containsEmail(line))
-                findings.add("Email detected at line " + (i + 1));
+            if (RegexDetector.containsEmail(line)) {
+                findings.add(new Finding("email", "low", i + 1));
+            }
 
-            if (RegexDetector.containsPhone(line))
-                findings.add("Phone detected at line " + (i + 1));
+            if (RegexDetector.containsPhone(line)) {
+                findings.add(new Finding("phone", "medium", i + 1));
+            }
 
-            if (RegexDetector.containsApiKey(line))
-                findings.add("API key detected at line " + (i + 1));
+            if (RegexDetector.containsApiKey(line)) {
+                findings.add(new Finding("api_key", "high", i + 1));
+            }
 
-            if (RegexDetector.containsPassword(line))
-                findings.add("Password detected at line " + (i + 1));
+            if (RegexDetector.containsPassword(line)) {
+                findings.add(new Finding("password", "critical", i + 1));
+            }
 
             if (RegexDetector.containsError(line)) {
-                findings.add("Error detected at line " + (i + 1));
+                findings.add(new Finding("error", "medium", i + 1));
                 errorCount++;
             }
         }
 
-        // Correlation detection
+        // Insights logic
         if (email && password)
             insights.add("Possible credential leakage detected.");
 
@@ -94,10 +99,8 @@ public class LogAnalysisService {
         if (phone && email)
             insights.add("PII data exposure detected.");
 
-
         if (errorCount > 3)
             insights.add("Anomaly detected: Too many errors in log file.");
-
 
         if (score >= 8)
             insights.add("High risk log file. Immediate action required.");
@@ -112,22 +115,32 @@ public class LogAnalysisService {
         if (error)
             insights.add("System error may reveal internal details");
 
-
+        // Mask sensitive data
         text = policyService.maskSensitiveData(text);
 
+        // Create final result
         AnalysisResult result = new AnalysisResult();
-        result.setSummary("File security analysis completed");
+
+        result.setSummary("Log contains sensitive credentials and errors");
         result.setContentType("log");
-        result.setAction("masked");
         result.setRiskScore(score);
-        result.setRiskLevel(level);
+
+        // Risk level logic
+        if (score >= 10)
+            result.setRiskLevel("high");
+        else if (score >= 5)
+            result.setRiskLevel("medium");
+        else
+            result.setRiskLevel("low");
+
+        result.setAction("masked");
         result.setFindings(findings);
         result.setInsights(insights);
 
         return result;
     }
 
-
+    // Streaming analysis (simulates real-time log monitoring)
     public void streamAnalyze(String text) {
         String[] lines = text.split("\n");
 
@@ -139,7 +152,7 @@ public class LogAnalysisService {
             }
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

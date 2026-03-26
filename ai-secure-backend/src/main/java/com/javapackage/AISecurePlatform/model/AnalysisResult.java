@@ -9,10 +9,10 @@ public class AnalysisResult {
     private String action;
     private int riskScore;
     private String riskLevel;
-    private List<String> findings;
+    private List<Finding> findings;
     private List<String> insights;
 
-
+    // Getter and Setter for summary
     public String getSummary() {
         return summary;
     }
@@ -21,6 +21,7 @@ public class AnalysisResult {
         this.summary = summary;
     }
 
+    // Getter and Setter for contentType
     public String getContentType() {
         return contentType;
     }
@@ -29,6 +30,7 @@ public class AnalysisResult {
         this.contentType = contentType;
     }
 
+    // Getter and Setter for action
     public String getAction() {
         return action;
     }
@@ -37,6 +39,7 @@ public class AnalysisResult {
         this.action = action;
     }
 
+    // Getter and Setter for riskScore
     public int getRiskScore() {
         return riskScore;
     }
@@ -45,6 +48,7 @@ public class AnalysisResult {
         this.riskScore = riskScore;
     }
 
+    // Getter and Setter for riskLevel
     public String getRiskLevel() {
         return riskLevel;
     }
@@ -53,14 +57,16 @@ public class AnalysisResult {
         this.riskLevel = riskLevel;
     }
 
-    public List<String> getFindings() {
+    // Getter and Setter for findings (IMPORTANT CHANGE)
+    public List<Finding> getFindings() {
         return findings;
     }
 
-    public void setFindings(List<String> findings) {
+    public void setFindings(List<Finding> findings) {
         this.findings = findings;
     }
 
+    // Getter and Setter for insights
     public List<String> getInsights() {
         return insights;
     }
