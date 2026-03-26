@@ -18,6 +18,7 @@ public class LogAnalysisService {
     private final PolicyService policyService;
 
     public LogAnalysisService(PolicyService policyService) {
+
         this.policyService = policyService;
     }
 

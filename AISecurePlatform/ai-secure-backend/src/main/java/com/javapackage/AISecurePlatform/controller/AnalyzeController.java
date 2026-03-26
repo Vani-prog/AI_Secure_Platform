@@ -56,6 +56,7 @@ public class AnalyzeController {
                     fileName.endsWith(".csv") ||
                     fileName.endsWith(".json") ||
                     fileName.endsWith(".xml"))  {
+
                 String content = new String(file.getBytes());
 
                 AnalysisResult result = service.analyzeText(content);
